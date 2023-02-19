@@ -41,6 +41,10 @@ dependencies {
     implementation("io.insert-koin:koin-ktor:$koin_ktor_version")
     implementation("io.insert-koin:koin-annotations:$koin_ksp_version")
     ksp("io.insert-koin:koin-ksp-compiler:$koin_ksp_version")
+
+    implementation("io.ktor:ktor-server-request-validation:$ktor_version")
+
+    implementation("com.ToxicBakery.library.bcrypt:bcrypt:+")
 }
 
 sourceSets.main {

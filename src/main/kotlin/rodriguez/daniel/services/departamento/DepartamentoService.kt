@@ -19,34 +19,26 @@ class DepartamentoService(
     @Named("DepartamentoRepositoryCached")
     private val dRepo: IDepartamentoRepository,
 ) {
-    suspend fun findDepartamentoById(id: UUID): Response<out DepartamentoDTO> = withContext(Dispatchers.IO) {
-        val entity = dRepo.findById(id)
-
-        if (entity == null) ResponseError(404, "Departamento with id $id not found.")
-        else ResponseSuccess(200, entity.toDTO())
+    suspend fun findDepartamentoById(id: UUID): DepartamentoDTO? = withContext(Dispatchers.IO) {
+        dRepo.findById(id)?.toDTO()
     }
 
-    suspend fun findAllDepartamentos(): Response<out List<DepartamentoDTO>> = withContext(Dispatchers.IO) {
+    suspend fun findAllDepartamentos(): List<DepartamentoDTO> = withContext(Dispatchers.IO) {
         val empleados = dRepo.findAll().toList()
         val response = mutableListOf<DepartamentoDTO>()
         empleados.forEach { response.add(it.toDTO()) }
 
-        if (response.isEmpty()) ResponseError(404, "There are no departamentos.")
-        else ResponseSuccess(200, response)
+        response
     }
 
-    suspend fun saveDepartamento(entity: DepartamentoDTOcreacion): Response<DepartamentoDTO> = withContext(Dispatchers.IO) {
-        ResponseSuccess(201, dRepo.save(entity.fromDTO()).toDTO())
+    suspend fun saveDepartamento(entity: DepartamentoDTOcreacion): DepartamentoDTO = withContext(Dispatchers.IO) {
+        dRepo.save(entity.fromDTO()).toDTO()
     }
 
-    suspend fun deleteDepartamento(id: UUID): Response<out DepartamentoDTO> = withContext(Dispatchers.IO) {
-        val entity = dRepo.findById(id) ?: return@withContext ResponseError(404, "Departamento with id $id not found.")
-        if (entity.toDTO().empleados.isNotEmpty())
-            return@withContext ResponseError(400, "Cannot delete a departamento with assigned empleados.")
+    suspend fun deleteDepartamento(id: UUID): DepartamentoDTO? = withContext(Dispatchers.IO) {
+        val entity = dRepo.findById(id) ?: return@withContext null
+        if (entity.toDTO().empleados.isNotEmpty()) return@withContext null
 
-        val res = dRepo.delete(id)
-
-        if (res == null) ResponseError(404, "Departamento with id $id not found.")
-        else ResponseSuccess(200, res.toDTO())
+        dRepo.delete(id)?.toDTO()
     }
 }

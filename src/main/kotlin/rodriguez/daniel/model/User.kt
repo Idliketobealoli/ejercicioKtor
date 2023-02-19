@@ -5,12 +5,14 @@ import rodriguez.daniel.services.serializers.UUIDSerializer
 import java.util.*
 
 @Serializable
-data class Empleado(
+data class User(
     @Serializable(with = UUIDSerializer::class)
     val id: UUID = UUID.randomUUID(),
-    val nombre: String,
     val email: String,
-    val avatar: String,
-    @Serializable(with = UUIDSerializer::class)
-    val departamentoId: UUID
+    val password: String,
+    val role: Role = Role.EMPLEADO
 )
+
+enum class Role {
+    EMPLEADO,ADMIN
+}

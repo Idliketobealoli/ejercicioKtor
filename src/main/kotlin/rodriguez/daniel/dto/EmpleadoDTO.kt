@@ -1,6 +1,7 @@
 package rodriguez.daniel.dto
 
 import kotlinx.serialization.Serializable
+import rodriguez.daniel.model.Role
 import rodriguez.daniel.services.serializers.UUIDSerializer
 import java.util.UUID
 
