@@ -22,6 +22,7 @@ fun Application.module() = runBlocking {
     configureStorage()
     configureSecurity()
     configureRouting()
+    configureSwagger()
 
     val userService: UserService by inject()
     val departamentoService: DepartamentoService by inject()

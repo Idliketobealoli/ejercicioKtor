@@ -1,5 +1,6 @@
 package rodriguez.daniel.routes
 
+import io.github.smiley4.ktorswaggerui.dsl.*
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -11,7 +12,6 @@ import io.ktor.server.routing.*
 import org.koin.ktor.ext.inject
 import rodriguez.daniel.dto.*
 import rodriguez.daniel.exception.UserUnauthorizedException
-import rodriguez.daniel.mappers.fromDTO
 import rodriguez.daniel.mappers.toDTO
 import rodriguez.daniel.model.Role
 import rodriguez.daniel.services.tokens.TokenService
@@ -27,7 +27,28 @@ fun Application.userRoutes() {
 
     routing {
         route("/$ENDPOINT") {
-            post("/register") {
+            post("/register", {
+                description = "Register."
+                request {
+                    body<UserDTOcreacion> {
+                        description = "Datos de registro."
+                        required = true
+                    }
+                }
+                response {
+                    default {
+                        description = "Devuelve tu usuario y un token."
+                    }
+                    HttpStatusCode.Created to {
+                        description = "Your information and token."
+                        body<UserDTOandToken> { description = "Your information and token." }
+                    }
+                    HttpStatusCode.BadRequest to {
+                        description = "Error message from a bad request."
+                        body<String> { description = "Error message from a bad request." }
+                    }
+                }
+            }) {
                 println("POST Register /$ENDPOINT/register")
                 try {
                     val dto = call.receive<UserDTOcreacion>()
@@ -42,7 +63,32 @@ fun Application.userRoutes() {
                 }
             }
 
-            get("/login") {
+            get("/login", {
+                description = "Login."
+                request {
+                    body<UserDTOlogin> {
+                        description = "Datos de logado."
+                        required = true
+                    }
+                }
+                response {
+                    default {
+                        description = "Devuelve tu usuario y un token."
+                    }
+                    HttpStatusCode.OK to {
+                        description = "Your information and token."
+                        body<UserDTOandToken> { description = "Your information and token." }
+                    }
+                    HttpStatusCode.BadRequest to {
+                        description = "Error message from a bad request."
+                        body<String> { description = "Error message from a bad request." }
+                    }
+                    HttpStatusCode.Unauthorized to {
+                        description = "Error at authenticating."
+                        body<String> { description = "Error at authenticating." }
+                    }
+                }
+            }) {
                 println("POST Login /$ENDPOINT/login")
                 try {
                     val dto = call.receive<UserDTOlogin>()
@@ -59,7 +105,32 @@ fun Application.userRoutes() {
             }
 
             authenticate {
-                get("/me") {
+                get("/me", {
+                    description = "Get your info."
+                    request {
+                        headerParameter<String>("token") {
+                            description = "Token para autenticarte."
+                            required = true
+                        }
+                    }
+                    response {
+                        default {
+                            description = "Devuelve tu usuario."
+                        }
+                        HttpStatusCode.OK to {
+                            description = "Your information."
+                            body<UserDTO?> { description = "Your information." }
+                        }
+                        HttpStatusCode.NotFound to {
+                            description = "User with id {id} not found."
+                            body<String> { description = "User with id {id} not found." }
+                        }
+                        HttpStatusCode.Unauthorized to {
+                            description = "Incorrect token."
+                            body<String> { description = "Incorrect token." }
+                        }
+                    }
+                }) {
                     println("GET Me /$ENDPOINT/me")
                     try {
                         val jwt = call.principal<JWTPrincipal>()
@@ -73,7 +144,36 @@ fun Application.userRoutes() {
                     }
                 }
 
-                get("/list") {
+                get("/list", {
+                    description = "Get All users."
+                    request {
+                        headerParameter<String>("token") {
+                            description = "Token para autenticarte."
+                            required = true
+                        }
+                    }
+                    response {
+                        default {
+                            description = "Devuelve todos los usuarios."
+                        }
+                        HttpStatusCode.OK to {
+                            description = "List of all users."
+                            body<List<UserDTO>> { description = "List of all users." }
+                        }
+                        HttpStatusCode.Forbidden to {
+                            description = "You can't consult all users."
+                            body<String> { description = "You can't consult all users." }
+                        }
+                        HttpStatusCode.Unauthorized to {
+                            description = "User with id {id} not found."
+                            body<String> { description = "User with id {id} not found." }
+                        }
+                        HttpStatusCode.NotFound to {
+                            description = "There are no users to be found."
+                            body<String> { description = "There are no users to be found." }
+                        }
+                    }
+                }) {
                     println("GET Users /$ENDPOINT/list")
                     try {
                         val jwt = call.principal<JWTPrincipal>()
