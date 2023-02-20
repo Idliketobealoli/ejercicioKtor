@@ -59,7 +59,7 @@ fun Application.storageRoutes() {
                 delete("{fileName}") {
                     println("DELETE /$ENDPOINT/{fileName}")
                     val jwt = call.principal<JWTPrincipal>()
-                    val userId = jwt?.payload?.getClaim("userId")
+                    val userId = jwt?.payload?.getClaim("id")
                         .toString().replace("\"", "")
                     val user = users.findUserById(UUID.fromString(userId.trim()))
                     if (user != null) {

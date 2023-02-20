@@ -2,8 +2,11 @@ package rodriguez.daniel.services.user
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.koin.core.annotation.Single
+import rodriguez.daniel.db.departamentos
+import rodriguez.daniel.db.users
 import rodriguez.daniel.dto.*
 import rodriguez.daniel.exception.UserUnauthorizedException
 import rodriguez.daniel.mappers.fromDTO
@@ -14,6 +17,8 @@ import java.util.*
 
 @Single
 class UserService(private val repo: IUserRepository) {
+    init { runBlocking { users().forEach { saveUser(it) } } }
+
     suspend fun findUserById(id: UUID): UserDTO? = withContext(Dispatchers.IO) {
         repo.findById(id)?.toDTO()
     }

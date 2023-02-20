@@ -4,6 +4,7 @@ val logback_version: String by project
 val koin_ktor_version: String by project
 val ksp_version: String by project
 val koin_ksp_version: String by project
+val ktor_swagger_ui_version: String by project
 
 plugins {
     kotlin("jvm") version "1.8.10"
@@ -23,6 +24,7 @@ application {
 
 repositories {
     mavenCentral()
+    maven("https://jitpack.io")
 }
 
 dependencies {
@@ -45,6 +47,8 @@ dependencies {
     implementation("io.ktor:ktor-server-request-validation:$ktor_version")
 
     implementation("com.ToxicBakery.library.bcrypt:bcrypt:+")
+
+    implementation("io.github.smiley4:ktor-swagger-ui:$ktor_swagger_ui_version")
 }
 
 sourceSets.main {

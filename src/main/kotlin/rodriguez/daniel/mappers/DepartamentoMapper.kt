@@ -15,4 +15,4 @@ suspend fun Departamento.toDTO() = DepartamentoDTO(
     eRepo.findAll().filter { it.departamentoId == id }.map { it.toDTO() }.toList()
 )
 fun DepartamentoDTOcreacion.fromDTO() =
-    Departamento(nombre = nombre, presupuesto = presupuesto)
+    Departamento(id = id, nombre = nombre, presupuesto = presupuesto)

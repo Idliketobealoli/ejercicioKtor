@@ -7,4 +7,4 @@ import rodriguez.daniel.services.utils.cipher
 import java.util.*
 
 fun User.toDTO() = UserDTO(email, role)
-fun UserDTOcreacion.fromDTO() = User(UUID.randomUUID(), email, cipher(password), role)
+fun UserDTOcreacion.fromDTO() = User(id, email, cipher(password), role)

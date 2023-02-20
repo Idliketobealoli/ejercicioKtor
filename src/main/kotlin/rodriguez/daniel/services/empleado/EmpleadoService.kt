@@ -2,10 +2,16 @@ package rodriguez.daniel.services.empleado
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.koin.core.annotation.Named
 import org.koin.core.annotation.Single
+import rodriguez.daniel.db.departamentos
+import rodriguez.daniel.db.empleados
 import rodriguez.daniel.dto.*
+import rodriguez.daniel.exception.DepartamentoExceptionNotFound
+import rodriguez.daniel.exception.EmpleadoExceptionBadRequest
+import rodriguez.daniel.exception.EmpleadoExceptionNotFound
 import rodriguez.daniel.mappers.fromDTO
 import rodriguez.daniel.mappers.toDTO
 import rodriguez.daniel.repositories.departamento.IDepartamentoRepository
@@ -19,8 +25,10 @@ class EmpleadoService(
     @Named("DepartamentoRepositoryCached")
     private val dRepo: IDepartamentoRepository,
 ) {
-    suspend fun findEmpleadoById(id: UUID): EmpleadoDTO? = withContext(Dispatchers.IO) {
-        eRepo.findById(id)?.toDTO()
+    init { runBlocking { empleados().forEach { saveEmpleado(it) } } }
+
+    suspend fun findEmpleadoById(id: UUID): EmpleadoDTO = withContext(Dispatchers.IO) {
+        eRepo.findById(id)?.toDTO() ?: throw EmpleadoExceptionNotFound("Couldn't find empleado with id $id.")
     }
 
     suspend fun findAllEmpleados(): List<EmpleadoDTO> = withContext(Dispatchers.IO) {
@@ -31,12 +39,13 @@ class EmpleadoService(
         response
     }
 
-    suspend fun saveEmpleado(entity: EmpleadoDTOcreacion): EmpleadoDTO? = withContext(Dispatchers.IO) {
-        dRepo.findById(entity.departamentoId) ?: return@withContext null
+    suspend fun saveEmpleado(entity: EmpleadoDTOcreacion): EmpleadoDTO = withContext(Dispatchers.IO) {
+        dRepo.findById(entity.departamentoId)
+            ?: throw DepartamentoExceptionNotFound("Couldn't find departamento with id ${entity.departamentoId}.")
         eRepo.save(entity.fromDTO()).toDTO()
     }
 
-    suspend fun deleteEmpleado(id: UUID): EmpleadoDTO? = withContext(Dispatchers.IO) {
-        eRepo.delete(id)?.toDTO()
+    suspend fun deleteEmpleado(id: UUID): EmpleadoDTO = withContext(Dispatchers.IO) {
+        eRepo.delete(id)?.toDTO() ?: throw EmpleadoExceptionBadRequest("Unable to delete empleado $id.")
     }
 }

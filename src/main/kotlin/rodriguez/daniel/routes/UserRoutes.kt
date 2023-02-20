@@ -11,6 +11,7 @@ import io.ktor.server.routing.*
 import org.koin.ktor.ext.inject
 import rodriguez.daniel.dto.*
 import rodriguez.daniel.exception.UserUnauthorizedException
+import rodriguez.daniel.mappers.fromDTO
 import rodriguez.daniel.mappers.toDTO
 import rodriguez.daniel.model.Role
 import rodriguez.daniel.services.tokens.TokenService
@@ -31,7 +32,9 @@ fun Application.userRoutes() {
                 try {
                     val dto = call.receive<UserDTOcreacion>()
                     val user = users.saveUser(dto)
-                    call.respond(HttpStatusCode.Created, user)
+                    val u = users.checkEmailAndPassword(dto.email, dto.password)
+                    val token = tokens.generateJWT(u)
+                    call.respond(HttpStatusCode.Created, UserDTOandToken(u.toDTO(), token))
                 } catch (e: Exception) {
                     call.respond(HttpStatusCode.BadRequest, e.message.toString())
                 } catch (e: RequestValidationException) {
@@ -39,7 +42,7 @@ fun Application.userRoutes() {
                 }
             }
 
-            post("/login") {
+            get("/login") {
                 println("POST Login /$ENDPOINT/login")
                 try {
                     val dto = call.receive<UserDTOlogin>()
@@ -60,7 +63,7 @@ fun Application.userRoutes() {
                     println("GET Me /$ENDPOINT/me")
                     try {
                         val jwt = call.principal<JWTPrincipal>()
-                        val userId = jwt?.payload?.getClaim("userId")
+                        val userId = jwt?.payload?.getClaim("id")
                             .toString().replace("\"", "")
                         val user = users.findUserById(UUID.fromString(userId.trim()))
                         if (user != null) call.respond(HttpStatusCode.OK, user)
@@ -74,7 +77,7 @@ fun Application.userRoutes() {
                     println("GET Users /$ENDPOINT/list")
                     try {
                         val jwt = call.principal<JWTPrincipal>()
-                        val userId = jwt?.payload?.getClaim("userId")
+                        val userId = jwt?.payload?.getClaim("id")
                             .toString().replace("\"", "")
                         val user = users.findUserById(UUID.fromString(userId.trim()))
                         if (user != null) {
