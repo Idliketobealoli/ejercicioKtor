@@ -5,6 +5,10 @@ val koin_ktor_version: String by project
 val ksp_version: String by project
 val koin_ksp_version: String by project
 val ktor_swagger_ui_version: String by project
+val junit_version: String by project
+val coroutines_version: String by project
+val koin_version: String by project
+val mockk_version: String by project
 
 plugins {
     kotlin("jvm") version "1.8.10"
@@ -35,8 +39,16 @@ dependencies {
     implementation("io.ktor:ktor-server-auth-jwt-jvm:$ktor_version")
     implementation("io.ktor:ktor-server-netty-jvm:$ktor_version")
     implementation("ch.qos.logback:logback-classic:$logback_version")
+    implementation("io.ktor:ktor-client-auth:$ktor_version")
     testImplementation("io.ktor:ktor-server-tests-jvm:$ktor_version")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:$junit_version")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:$junit_version")
+    testImplementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
+    testImplementation("io.insert-koin:koin-test:$koin_version")
+    testImplementation("io.insert-koin:koin-test-junit5:$koin_version")
+    testImplementation("io.mockk:mockk:$mockk_version")
 
     implementation("io.github.reactivecircus.cache4k:cache4k:0.9.0")
 
@@ -51,6 +63,36 @@ dependencies {
     implementation("io.github.smiley4:ktor-swagger-ui:$ktor_swagger_ui_version")
 }
 
+tasks.test {
+    useJUnitPlatform()
+}
+
 sourceSets.main {
     java.srcDirs("build/generated/ksp/main/kotlin")
+}
+
+ktor {
+    docker {
+        localImageName.set("ejercicio-ktor-daniel-rodriguez")
+        imageTag.set("0.0.1-preview")
+        jreVersion.set(io.ktor.plugin.features.JreVersion.JRE_17)
+        portMappings.set(
+            listOf(
+                io.ktor.plugin.features.DockerPortMapping(
+                    6969,
+                    6969,
+                    io.ktor.plugin.features.DockerPortMappingProtocol.TCP
+                ),
+                io.ktor.plugin.features.DockerPortMapping(
+                    6963,
+                    6963,
+                    io.ktor.plugin.features.DockerPortMappingProtocol.TCP
+                )
+            )
+        )
+    }
+}
+
+kotlin {
+    jvmToolchain(17)
 }

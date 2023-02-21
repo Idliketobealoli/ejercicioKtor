@@ -24,8 +24,6 @@ class DepartamentoService(
     @Named("DepartamentoRepositoryCached")
     private val dRepo: IDepartamentoRepository,
 ) {
-    init { runBlocking { departamentos().forEach { saveDepartamento(it) } } }
-
     suspend fun findDepartamentoById(id: UUID): DepartamentoDTO = withContext(Dispatchers.IO) {
         dRepo.findById(id)?.toDTO() ?: throw DepartamentoExceptionNotFound("Couldn't find departamento with id $id.")
     }

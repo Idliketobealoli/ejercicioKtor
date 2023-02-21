@@ -27,6 +27,7 @@ fun Application.module() = runBlocking {
     val userService: UserService by inject()
     val departamentoService: DepartamentoService by inject()
     val empleadoService: EmpleadoService by inject()
+
     loadData(userService, departamentoService, empleadoService)
 }
 

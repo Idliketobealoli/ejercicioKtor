@@ -12,7 +12,7 @@ val admin = UserDTOcreacion(
 )
 val user = UserDTOcreacion(
     UUID.fromString("93a98d69-6da6-48a7-b34f-05b596ea0000"),
-    "loli@gmail.com", "loli1707", Role.EMPLEADO
+    "user@gmail.com", "1234567", Role.EMPLEADO
 )
 
 val empleado1 = EmpleadoDTOcreacion(

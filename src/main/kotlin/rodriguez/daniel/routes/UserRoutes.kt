@@ -119,7 +119,7 @@ fun Application.userRoutes() {
                         }
                         HttpStatusCode.OK to {
                             description = "Your information."
-                            body<UserDTO?> { description = "Your information." }
+                            body<UserDTO> { description = "Your information." }
                         }
                         HttpStatusCode.NotFound to {
                             description = "User with id {id} not found."

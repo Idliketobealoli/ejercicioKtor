@@ -17,8 +17,6 @@ import java.util.*
 
 @Single
 class UserService(private val repo: IUserRepository) {
-    init { runBlocking { users().forEach { saveUser(it) } } }
-
     suspend fun findUserById(id: UUID): UserDTO? = withContext(Dispatchers.IO) {
         repo.findById(id)?.toDTO()
     }

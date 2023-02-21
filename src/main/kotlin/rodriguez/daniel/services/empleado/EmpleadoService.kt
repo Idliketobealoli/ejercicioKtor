@@ -25,8 +25,6 @@ class EmpleadoService(
     @Named("DepartamentoRepositoryCached")
     private val dRepo: IDepartamentoRepository,
 ) {
-    init { runBlocking { empleados().forEach { saveEmpleado(it) } } }
-
     suspend fun findEmpleadoById(id: UUID): EmpleadoDTO = withContext(Dispatchers.IO) {
         eRepo.findById(id)?.toDTO() ?: throw EmpleadoExceptionNotFound("Couldn't find empleado with id $id.")
     }
